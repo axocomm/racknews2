@@ -27,6 +27,8 @@ RUN chmod 777 /var/log/nginx
 RUN mkdir -p /run/php
 RUN sed -i 's/;daemonize = yes/daemonize = no/' /etc/php/7.0/fpm/php-fpm.conf
 
+VOLUME /www /www/racktables/wwwroot/racknews
+
 EXPOSE 80 443
 
 CMD ["/usr/local/bin/supervisord", "-n"]
