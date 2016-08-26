@@ -1,0 +1,24 @@
+version: '2'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      args:
+        - HOST_USER_ID
+    ports:
+      - '8080:80'
+    depends_on:
+      - db
+    volumes:
+      - ./data/www:/www
+  db:
+    build:
+      context: .
+      dockerfile: docker/db.Dockerfile
+      args:
+        - HOST_USER_ID
+    environment:
+      MYSQL_ROOT_PASSWORD: 'secretlol'
+    volumes:
+      - ./data/mysql:/var/lib/mysql
