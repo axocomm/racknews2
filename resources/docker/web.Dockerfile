@@ -5,6 +5,9 @@ RUN apt-get update && apt-get -y install \
     nginx \
     php7.0-fpm \
     php7.0-mysql \
+    php7.0-gd \
+    php7.0-mbstring \
+    php7.0-bcmath \
     ca-certificates \
     python-setuptools
 
