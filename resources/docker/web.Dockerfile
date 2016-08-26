@@ -12,9 +12,9 @@ RUN usermod -u $HOST_USER_ID www-data
 # supervisord
 RUN /usr/bin/easy_install supervisor
 RUN /usr/bin/easy_install supervisor-stdout
-ADD ./conf/supervisord.conf /etc/supervisord.conf
+ADD ./resources/config/supervisord.conf /etc/supervisord.conf
 
-COPY ./conf/vhost.conf /etc/nginx/sites-enabled/racktables.dev
+COPY ./resources/config/vhost.conf /etc/nginx/sites-enabled/racktables.dev
 RUN echo 'daemon off;' >> /etc/nginx/nginx.conf
 RUN chmod 777 /var/log/nginx
 
