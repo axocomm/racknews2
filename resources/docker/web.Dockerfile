@@ -1,9 +1,12 @@
 FROM ubuntu:latest
 
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get -y install \
     nginx \
     php7.0-fpm \
-    php7.0-mysql
+    php7.0-mysql \
+    ca-certificates \
+    python-setuptools
 
 # update UID for volume permissions
 ARG HOST_USER_ID=1000

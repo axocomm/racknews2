@@ -3,7 +3,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: docker/web.Dockerfile
+      dockerfile: resources/docker/web.Dockerfile
       args:
         - HOST_USER_ID
     ports:
@@ -15,7 +15,7 @@ services:
   db:
     build:
       context: .
-      dockerfile: docker/db.Dockerfile
+      dockerfile: resources/docker/db.Dockerfile
       args:
         - HOST_USER_ID
     environment:
