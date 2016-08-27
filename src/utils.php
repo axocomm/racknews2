@@ -13,15 +13,19 @@ class ObjectUtils {
     return array_reduce(
       array_keys($params),
       function ($acc, $key) use ($params) {
+        $val = $params[$key];
+
         switch ($key) {
           case 'has':
-            return self::withKey($acc, $params[$key]);
+            return self::withKey($acc, $val);
           case 'all':
           case 'any':
-            $match_map = self::getMatchMap($params[$key]);
+            $match_map = self::getMatchMap($val);
             return self::objectsMatching($acc, $match_map, $key);
           case 'type':
-            return self::ofType($acc, $params[$key]);
+            return self::ofType($acc, $val);
+          case 'comment':
+            return self::withComment($acc, $val);
           default:
             return $acc;
         }
@@ -69,6 +73,23 @@ class ObjectUtils {
       $objects,
       function ($object) use ($type_id) {
         return $object['objtype_id'] === $type_id;
+      }
+    );
+  }
+
+  /**
+   * Get objects whose comments include the given text.
+   *
+   * @param array  $objects
+   * @param string $comment
+   *
+   * @return array the resulting objects
+   */
+  public static function withComment($objects, $comment) {
+    return array_filter(
+      $objects,
+      function ($object) use ($comment) {
+        return stripos($object['comment'], $comment) !== false;
       }
     );
   }
