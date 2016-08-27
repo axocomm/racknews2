@@ -6,9 +6,8 @@ require RACKTABLES_ROOT . '/inc/init.php';
 function get_objects() {
   $rt_objects = scanRealmByText('object');
 
-  return array_reduce(
-    $rt_objects,
-    function ($acc, $object) {
+  return array_map(
+    function ($object) {
       $info = spotEntity('object', $object['id']);
       amplifyCell($info);
 
@@ -26,9 +25,8 @@ function get_objects() {
       );
 
       $info = array_merge($info, $attrs);
-      $acc[$info['name']] = $info;
-      return $acc;
+      return $info;
     },
-    array()
+    $rt_objects
   );
 }

@@ -2,7 +2,7 @@
 namespace Racknews;
 
 class ObjectUtils {
-  const MATCH_RE = '/^([A-Za-z]+):(.+)$/';
+  const MATCH_RE = '/^([A-Za-z_]+):(.+)$/';
 
   public static function query($objects, array $params) {
     return array_reduce(
@@ -31,32 +31,20 @@ class ObjectUtils {
    * @return array objects containing that key
    */
   public static function withKey($objects, $key) {
-    return array_reduce(
-      array_keys($objects),
-      function ($matching, $name) use ($objects, $key) {
-        $object = $objects[$name];
-        if (array_key_exists($key, $object)) {
-          $matching[$name] = $object;
-        }
-
-        return $matching;
-      },
-      array()
+    return array_filter(
+      $objects,
+      function ($object) use ($key) {
+        return array_key_exists($key, $object);
+      }
     );
   }
 
   public static function objectsMatching($objects, $match_map) {
-    return array_reduce(
-      array_keys($objects),
-      function ($matching, $name) use ($objects, $match_map) {
-        $object = $objects[$name];
-        if (self::objectMatches($object, $match_map)) {
-          $matching[$name] = $object;
-        }
-
-        return $matching;
-      },
-      array()
+    return array_filter(
+      $objects,
+      function ($object) use ($match_map) {
+        return self::objectMatches($object, $match_map);
+      }
     );
   }
 
@@ -64,7 +52,6 @@ class ObjectUtils {
     $results = array_map(
       function ($field) use ($object, $match_map) {
         $value = $match_map[$field];
-
         return isset($object[$field]) &&
                ((string) $object[$field]) === $value;
 
