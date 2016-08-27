@@ -1,6 +1,9 @@
 <?php
 namespace Racknews;
 
+// NB: probably want to organize this better and have a
+// consistent naming scheme for methods
+
 class ObjectUtils {
   const MATCH_RE = '/^([A-Za-z_]+):(.+)$/';
   const MATCH_ANY = 'any';
@@ -17,6 +20,8 @@ class ObjectUtils {
           case 'any':
             $match_map = self::getMatchMap($params[$key]);
             return self::objectsMatching($acc, $match_map, $key);
+          case 'type':
+            return self::ofType($acc, $params[$key]);
           default:
             return $acc;
         }
@@ -38,6 +43,32 @@ class ObjectUtils {
       $objects,
       function ($object) use ($key) {
         return array_key_exists($key, $object);
+      }
+    );
+  }
+
+  /**
+   * Get objects of the given type.
+   *
+   * @param array  $objects
+   * @param string $type the type name
+   *
+   * @return array objects of the given type
+   */
+  public static function ofType($objects, $type) {
+    $types = readChapter(CHAP_OBJTYPE);
+    $types = array_flip(array_map('strtolower', $types));
+
+    $type = strtolower($type);
+    if (!array_key_exists($type, $types)) {
+      return array();
+    }
+
+    $type_id = (string) $types[$type];
+    return array_filter(
+      $objects,
+      function ($object) use ($type_id) {
+        return $object['objtype_id'] === $type_id;
       }
     );
   }
