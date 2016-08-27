@@ -19,7 +19,7 @@ function get_objects() {
             throw new \Exception("Broken record for {$object['id']}");
           }
 
-          $attr_acc[$rec['name']] = $record['value'];
+          $attr_acc[$record['name']] = $record['value'];
           return $attr_acc;
         },
         array()
