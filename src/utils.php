@@ -26,6 +26,8 @@ class ObjectUtils {
             return self::ofType($acc, $val);
           case 'comment':
             return self::withComment($acc, $val);
+          case 'log':
+            return self::withLogMessage($acc, $val);
           default:
             return $acc;
         }
@@ -90,6 +92,31 @@ class ObjectUtils {
       $objects,
       function ($object) use ($comment) {
         return stripos($object['comment'], $comment) !== false;
+      }
+    );
+  }
+
+  /**
+   * Get objects whose logs contain the given string.
+   *
+   * @param array  $objects
+   * @param string $log_message
+   *
+   * @return array objects with the given log message
+   */
+  public static function withLogMessage($objects, $log_message) {
+    return array_filter(
+      $objects,
+      function ($object) use ($log_message) {
+        $logs = getLogRecordsForObject($object['id']);
+        $matching = array_filter(
+          $logs,
+          function ($log) use ($log_message) {
+            return stripos($log['content'], $log_message) !== false;
+          }
+        );
+
+        return count($matching) > 0;
       }
     );
   }
