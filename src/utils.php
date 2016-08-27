@@ -3,6 +3,8 @@ namespace Racknews;
 
 class ObjectUtils {
   const MATCH_RE = '/^([A-Za-z_]+):(.+)$/';
+  const MATCH_ANY = 'any';
+  const MATCH_ALL = 'all';
 
   public static function query($objects, array $params) {
     return array_reduce(
@@ -11,9 +13,10 @@ class ObjectUtils {
         switch ($key) {
           case 'has':
             return self::withKey($acc, $params[$key]);
-          case 'matches':
+          case 'all':
+          case 'any':
             $match_map = self::getMatchMap($params[$key]);
-            return self::objectsMatching($acc, $match_map);
+            return self::objectsMatching($acc, $match_map, $key);
           default:
             return $acc;
         }
@@ -39,16 +42,39 @@ class ObjectUtils {
     );
   }
 
-  public static function objectsMatching($objects, $match_map) {
+  /**
+   * Get objects that match the given fields.
+   *
+   * @param array  $objects
+   * @param array  $match_map desired fields and values
+   * @param string $mode whether to match any or all
+   *
+   * @return array objects matching all given fields
+   */
+  public static function objectsMatching(
+    $objects,
+    $match_map,
+    $mode = self::MATCH_ALL
+  ) {
     return array_filter(
       $objects,
-      function ($object) use ($match_map) {
-        return self::objectMatches($object, $match_map);
+      function ($object) use ($match_map, $mode) {
+        return self::objectMatches($object, $match_map, $mode);
       }
     );
   }
 
-  public static function objectMatches($object, $match_map) {
+  /**
+   * Determine if fields of this object match all in the given
+   * match map.
+   *
+   * @param array  $object
+   * @param array  $match_map
+   * @param string $mode whether to match any or all fields
+   *
+   * @return bool if the object matches
+   */
+  public static function objectMatches($object, $match_map, $mode) {
     $results = array_map(
       function ($field) use ($object, $match_map) {
         $value = $match_map[$field];
@@ -59,7 +85,13 @@ class ObjectUtils {
       array_keys($match_map)
     );
 
-    return self::all($results);
+    switch ($mode) {
+      case self::MATCH_ANY:
+        return self::any($results);
+      case self::MATCH_ALL:
+      default:
+        return self::all($results);
+    }
   }
 
   /**
@@ -91,9 +123,20 @@ class ObjectUtils {
    *
    * @param array $arr
    *
-   * @return array if all values are true
+   * @return bool if all values are true
    */
   private static function all($arr) {
     return count(array_unique($arr)) === 1 && current($arr);
+  }
+
+  /**
+   * Return true if any of the array values are true.
+   *
+   * @param array $arr
+   *
+   * @return bool if any values are true
+   */
+  private static function any($arr) {
+    return count(array_filter($arr)) > 0;
   }
 }
