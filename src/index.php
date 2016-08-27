@@ -3,13 +3,10 @@ require 'vendor/autoload.php';
 require 'init.php';
 require 'utils.php';
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
-
 use \Racknews\ObjectUtils as ObjectUtils;
 
 $app = new \Slim\App;
-$app->get('/', function (Request $request, Response $response) {
+$app->get('/', function ($request, $response) {
   $resp = array(
     'success'         => true,
     'racktables_root' => RACKTABLES_ROOT
@@ -18,13 +15,21 @@ $app->get('/', function (Request $request, Response $response) {
   $response->withJson($resp);
 });
 
-$app->get('/objects', function (Request $request, Response $response) {
-  $objects = get_objects();
-  $params = $request->getQueryParams();
+$app->group('/objects', function () {
+  $this->get('/', function ($request, $response) {
+    $objects = get_objects();
+    $params = $request->getQueryParams();
 
-  $result = ObjectUtils::query($objects, $params);
+    $result = ObjectUtils::query($objects, $params);
 
-  $response->withJson($result);
+    $response->withJson($result);
+  });
+
+  $this->get('/{id:[0-9]+}', function ($request, $response, $args) {
+    $objects = get_objects();
+    $id = $args['id'];
+    $response->withJson(ObjectUtils::byId($objects, $id));
+  });
 });
 
 $app->run();

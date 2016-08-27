@@ -36,6 +36,21 @@ class ObjectUtils {
     );
   }
 
+  public static function byId($objects, $id) {
+    $matches = array_filter(
+      $objects,
+      function ($object) use ($id) {
+        return (string) $object['id'] === $id;
+      }
+    );
+
+    if (count($matches)) {
+      return current($matches);
+    }
+
+    return array();
+  }
+
   /**
    * Get objects that contain the given key.
    *
