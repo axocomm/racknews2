@@ -19,14 +19,10 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->group('/objects', function () {
-  $this->get('', function ($request, $response, $args) {
-    AppController::getObjects($request, $response, $args);
-  });
+  $this->get('', '\Racknews\AppController:getObjects');
 
   $this->group('/{id-or-name}', function () {
-    $this->get('', function ($request, $response, $args) {
-      AppController::getObject($request, $response, $args);
-    });
+    $this->get('', '\Racknews\AppController:getObject');
   });
 });
 
