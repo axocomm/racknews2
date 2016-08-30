@@ -21,6 +21,8 @@ $app->get('/', function ($request, $response) {
 $app->group('/objects', function () {
   $this->get('', '\Racknews\AppController:getObjects');
 
+  $this->post('', '\Racknews\AppController:addObjects');
+
   $this->group('/{id-or-name}', function () {
     $this->get('', '\Racknews\AppController:getObject');
   });
