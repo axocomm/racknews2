@@ -9,7 +9,9 @@ class ObjectUtils {
   const MATCH_ANY = 'any';
   const MATCH_ALL = 'all';
 
-  public static function query($objects, array $params) {
+  public static function getObjects($params = array()) {
+    $objects = get_objects();
+
     return array_reduce(
       array_keys($params),
       function ($acc, $key) use ($params) {
@@ -20,7 +22,7 @@ class ObjectUtils {
             return self::withKey($acc, $val);
           case 'all':
           case 'any':
-            $match_map = self::getMatchMap($val);
+            $match_map = (is_array($val)) ? $val : self::getMatchMap($val);
             return self::objectsMatching($acc, $match_map, $key);
           case 'type':
             return self::ofType($acc, $val);
