@@ -1,7 +1,8 @@
 <?php
 require 'vendor/autoload.php';
 require 'init.php';
-require 'utils.php';
+
+require 'ObjectUtils.class.php';
 
 use \Racknews\ObjectUtils as ObjectUtils;
 
