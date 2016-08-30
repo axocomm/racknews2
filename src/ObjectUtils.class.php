@@ -64,8 +64,7 @@ class ObjectUtils {
    * @return array objects of the given type
    */
   public static function ofType($objects, $type) {
-    $types = readChapter(CHAP_OBJTYPE);
-    $types = array_flip(array_map('strtolower', $types));
+    $types = self::getObjectTypeMap();
 
     $type = strtolower($type);
     if (!array_key_exists($type, $types)) {
@@ -173,6 +172,16 @@ class ObjectUtils {
       default:
         return self::all($results);
     }
+  }
+
+  /**
+   * Get object type IDs keyed by lowercased name.
+   *
+   * @return array
+   */
+  public static function getObjectTypeMap() {
+    $types = readChapter(CHAP_OBJTYPE);
+    return array_flip(array_map('strtolower', $types));
   }
 
   /**
