@@ -3,8 +3,10 @@ require 'vendor/autoload.php';
 require 'init.php';
 
 require 'ObjectUtils.class.php';
+require 'AppController.class.php';
 
 use \Racknews\ObjectUtils as ObjectUtils;
+use \Racknews\AppController as AppController;
 
 $app = new \Slim\App;
 $app->get('/', function ($request, $response) {
@@ -17,19 +19,12 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->group('/objects', function () {
-  $this->get('', function ($request, $response) {
-    $objects = get_objects();
-    $params = $request->getQueryParams();
-
-    $result = ObjectUtils::query($objects, $params);
-
-    $response->withJson($result);
+  $this->get('', function ($request, $response, $args) {
+    AppController::getObjects($request, $response, $args);
   });
 
   $this->get('/{id:[0-9]+}', function ($request, $response, $args) {
-    $objects = get_objects();
-    $id = $args['id'];
-    $response->withJson(ObjectUtils::byId($objects, $id));
+    AppController::getObject($request, $response, $args);
   });
 });
 
