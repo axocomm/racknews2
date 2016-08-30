@@ -13,10 +13,11 @@ class AppController {
   }
 
   public static function getObject($request, $response, $args) {
-    $id = $args['id'];
+    $id_or_name = $args['id-or-name'];
     $params = array(
-      'all' => array(
-        'id' => $id
+      'any' => array(
+        'id'   => $id_or_name,
+        'name' => $id_or_name
       )
     );
 

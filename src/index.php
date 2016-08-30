@@ -23,8 +23,10 @@ $app->group('/objects', function () {
     AppController::getObjects($request, $response, $args);
   });
 
-  $this->get('/{id:[0-9]+}', function ($request, $response, $args) {
-    AppController::getObject($request, $response, $args);
+  $this->group('/{id-or-name}', function () {
+    $this->get('', function ($request, $response, $args) {
+      AppController::getObject($request, $response, $args);
+    });
   });
 });
 
