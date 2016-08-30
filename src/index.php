@@ -17,7 +17,7 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->group('/objects', function () {
-  $this->get('/', function ($request, $response) {
+  $this->get('', function ($request, $response) {
     $objects = get_objects();
     $params = $request->getQueryParams();
 
