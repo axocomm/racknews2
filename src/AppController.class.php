@@ -20,7 +20,8 @@ class AppController {
       )
     );
 
-    $object = ObjectUtils::getObjects($params);
+    $objects = ObjectUtils::getObjects($params);
+    $object = (count($objects) > 0) ? current($objects) : null;
 
     $response->withJson(array(
       'success' => true,
