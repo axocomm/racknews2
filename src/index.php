@@ -2,9 +2,11 @@
 require 'vendor/autoload.php';
 require 'init.php';
 
+require 'Helpers.class.php';
 require 'ObjectUtils.class.php';
 require 'AppController.class.php';
 
+use \Racknews\Helpers as Helpers;
 use \Racknews\ObjectUtils as ObjectUtils;
 use \Racknews\AppController as AppController;
 

@@ -30,14 +30,25 @@ class AppController {
     ));
   }
 
+  /**
+   * Add new objects.
+   *
+   * Depending on the Content-type header, this method will try to
+   *   parse a CSV or JSON request body.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success and either error or added IDs
+   */
   public static function addObjects($request, $response, $args) {
-    $json = $request->getBody();
-    $data = @json_decode($json, true);
+    $data = self::parseNewObjectData($request);
 
     if ($data === null) {
       $response->withJson(array(
         'success' => false,
-        'error'   => 'Could not parse JSON'
+        'error'   => 'Could not read request data'
       ));
 
       return $response;
@@ -77,6 +88,41 @@ class AppController {
       'success' => true,
       'objects' => $results
     ));
+  }
+
+  /**
+   * Read new objects from CSV or JSON request body depending on
+   *   the Content-type header (default JSON)
+   *
+   * @param object $request the request object
+   *
+   * @return array the parsed request body or null
+   */
+  private static function parseNewObjectData($request) {
+    $content_type = $request->getHeader('Content-type');
+    $body = $request->getBody();
+
+    switch ($content_type[0]) {
+      case 'text/plain':
+        $objects = Helpers::csvToArray($body);
+        $objects = array_map(
+          function ($object) {
+            if (strlen($object['tags'])) {
+              $object['tags'] = str_getcsv($object['tags']);
+            } else {
+              unset($object['tags']);
+            }
+
+            return $object;
+          },
+          $objects
+        );
+
+        return array('objects' => $objects);
+      case 'application/json':
+      default:
+        return @json_decode($body, true);
+    }
   }
 
   /**
