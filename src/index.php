@@ -1,12 +1,33 @@
 <?php
 require 'vendor/autoload.php';
+require 'init.php';
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+require 'Helpers.class.php';
+require 'ObjectUtils.class.php';
+require 'AppController.class.php';
+
+use \Racknews\Helpers as Helpers;
+use \Racknews\ObjectUtils as ObjectUtils;
+use \Racknews\AppController as AppController;
 
 $app = new \Slim\App;
-$app->get('/', function (Request $request, Response $response) {
-  $response->withJson(array('foo' => 'bar'));
+$app->get('/', function ($request, $response) {
+  $resp = array(
+    'success'         => true,
+    'racktables_root' => RACKTABLES_ROOT
+  );
+
+  $response->withJson($resp);
+});
+
+$app->group('/objects', function () {
+  $this->get('', '\Racknews\AppController:getObjects');
+
+  $this->post('', '\Racknews\AppController:addObjects');
+
+  $this->group('/{id-or-name}', function () {
+    $this->get('', '\Racknews\AppController:getObject');
+  });
 });
 
 $app->run();
