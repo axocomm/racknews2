@@ -2,6 +2,16 @@
 namespace Racknews;
 
 class AppController {
+
+  /**
+   * Query RackTables objects.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success and matching objects
+   */
   public static function getObjects($request, $response, $args) {
     $params = $request->getQueryParams();
     $objects = ObjectUtils::getObjects($params);
@@ -12,6 +22,15 @@ class AppController {
     ));
   }
 
+  /**
+   * Get a single object by ID or name.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success and the matching object if found
+   */
   public static function getObject($request, $response, $args) {
     $id_or_name = $args['id-or-name'];
     $params = array(
@@ -22,12 +41,17 @@ class AppController {
     );
 
     $objects = ObjectUtils::getObjects($params);
-    $object = (count($objects) > 0) ? current($objects) : null;
-
-    $response->withJson(array(
-      'success' => true,
-      'object'  => $object
-    ));
+    if (count($objects) > 0) {
+      $response->withJson(array(
+        'success' => true,
+        'object'  => current($objects)
+      ));
+    } else {
+      $response->withJson(array(
+        'success' => false,
+        'error'   => "Could not find object matching {$id_or_name}"
+      ));
+    }
   }
 
   /**
