@@ -18,6 +18,18 @@ class Helpers {
   }
 
   /**
+   * Compute the union of two arrays.
+   *
+   * @param array $a
+   * @param array $b
+   *
+   * @return array
+   */
+  public static function union($a, $b) {
+    return array_unique(array_merge($a, $b));
+  }
+
+  /**
    * Return true iff all array values are true.
    *
    * @param array $arr

@@ -30,6 +30,8 @@ class ObjectUtils {
             return self::withComment($acc, $val);
           case 'log':
             return self::withLogMessage($acc, $val);
+          case 'tagged':
+            return self::tagged($acc, explode(',', $val));
           default:
             return $acc;
         }
@@ -120,6 +122,52 @@ class ObjectUtils {
         return count($matching) > 0;
       }
     );
+  }
+
+  /**
+   * Get objects with the given tags (any type).
+   *
+   * @param array $objects
+   * @param array $tags
+   *
+   * @return array objects with any of the given tags
+   */
+  public static function tagged($objects, $tags) {
+    return array_filter(
+      $objects,
+      function ($object) use ($tags) {
+        $object_tags = self::getObjectTags($object);
+        return count(array_intersect($object_tags, $tags)) > 0;
+      }
+    );
+  }
+
+  /**
+   * Get atags, etags, and itags of the given object.
+   *
+   * @param array $object
+   *
+   * @return array
+   */
+  public static function getObjectTags($object) {
+    $tag_vals = function ($tag_arr) {
+      return array_map(function ($tag) {
+        return $tag['tag'];
+      }, $tag_arr);
+    };
+
+    $object_tags = array_map(
+      $tag_vals,
+      array(
+        $object['atags'],
+        $object['etags'],
+        $object['itags']
+      )
+    );
+
+    $object_tags = call_user_func_array('array_merge', $object_tags);
+
+    return array_unique($object_tags);
   }
 
   /**
