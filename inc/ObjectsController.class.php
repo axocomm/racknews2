@@ -1,7 +1,7 @@
 <?php
 namespace Racknews;
 
-class AppController {
+class ObjectsController {
 
   /**
    * Query RackTables objects.

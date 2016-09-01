@@ -4,11 +4,11 @@ require 'init.php';
 
 require 'inc/Helpers.class.php';
 require 'inc/ObjectUtils.class.php';
-require 'inc/AppController.class.php';
+require 'inc/ObjectsController.class.php';
 
 use \Racknews\Helpers as Helpers;
 use \Racknews\ObjectUtils as ObjectUtils;
-use \Racknews\AppController as AppController;
+use \Racknews\ObjectsController as ObjectsController;
 
 $app = new \Slim\App;
 $app->get('/', function ($request, $response) {
@@ -21,13 +21,13 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->group('/objects', function () {
-  $this->get('', '\Racknews\AppController:getObjects');
+  $this->get('', '\Racknews\ObjectsController:getObjects');
 
-  $this->post('', '\Racknews\AppController:addObjects');
+  $this->post('', '\Racknews\ObjectsController:addObjects');
 
   $this->group('/{id-or-name}', function () {
-    $this->get('', '\Racknews\AppController:getObject');
-    $this->delete('', '\Racknews\AppController:deleteObject');
+    $this->get('', '\Racknews\ObjectsController:getObject');
+    $this->delete('', '\Racknews\ObjectsController:deleteObject');
   });
 });
 
