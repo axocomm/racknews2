@@ -108,6 +108,34 @@ class AppController {
   }
 
   /**
+   * Delete an object by ID or name.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success
+   */
+  public static function deleteObject($request, $response, $args) {
+    $id_or_name = $args['id-or-name'];
+    $object = self::getObjectByIdentifier($id_or_name);
+    if ($object === null) {
+      return $response->withJson(array(
+        'success' => false,
+        'error'   => "Object {$id_or_name} does not exist"
+      ));
+    }
+
+    $id = $object['id'];
+    commitDeleteObject($id);
+
+    $response->withJson(array(
+      'success' => true,
+      'message' => "Deleted $id"
+    ));
+  }
+
+  /**
    * Read new objects from CSV or JSON request body depending on
    *   the Content-type header (default JSON)
    *

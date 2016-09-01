@@ -27,6 +27,7 @@ $app->group('/objects', function () {
 
   $this->group('/{id-or-name}', function () {
     $this->get('', '\Racknews\AppController:getObject');
+    $this->delete('', '\Racknews\AppController:deleteObject');
   });
 });
 
