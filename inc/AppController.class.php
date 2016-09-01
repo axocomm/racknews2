@@ -33,18 +33,11 @@ class AppController {
    */
   public static function getObject($request, $response, $args) {
     $id_or_name = $args['id-or-name'];
-    $params = array(
-      'any' => array(
-        'id'   => $id_or_name,
-        'name' => $id_or_name
-      )
-    );
-
-    $objects = ObjectUtils::getObjects($params);
-    if (count($objects) > 0) {
+    $object = self::getObjectByIdentifier($id_or_name);
+    if ($object !== null) {
       $response->withJson(array(
         'success' => true,
-        'object'  => current($objects)
+        'object'  => $object
       ));
     } else {
       $response->withJson(array(
@@ -219,5 +212,17 @@ class AppController {
       },
       array('objects' => array())
     );
+  }
+
+  private static function getObjectByIdentifier($id_or_name) {
+    $params = array(
+      'any' => array(
+        'id'   => $id_or_name,
+        'name' => $id_or_name
+      )
+    );
+
+    $objects = ObjectUtils::getObjects($params);
+    return (count($objects) > 0) ? current($objects) : null;
   }
 }
