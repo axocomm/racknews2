@@ -167,10 +167,10 @@ class ObjectUtils {
 
     switch ($mode) {
       case self::MATCH_ANY:
-        return self::any($results);
+        return Helpers::any($results);
       case self::MATCH_ALL:
       default:
-        return self::all($results);
+        return Helpers::all($results);
     }
   }
 
@@ -206,27 +206,5 @@ class ObjectUtils {
 
       return $acc;
     }, array());
-  }
-
-  /**
-   * Return true iff all array values are true.
-   *
-   * @param array $arr
-   *
-   * @return bool if all values are true
-   */
-  private static function all($arr) {
-    return count(array_unique($arr)) === 1 && current($arr);
-  }
-
-  /**
-   * Return true if any of the array values are true.
-   *
-   * @param array $arr
-   *
-   * @return bool if any values are true
-   */
-  private static function any($arr) {
-    return count(array_filter($arr)) > 0;
   }
 }

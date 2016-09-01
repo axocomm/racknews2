@@ -16,4 +16,27 @@ class Helpers {
       $rows
     );
   }
+
+  /**
+   * Return true iff all array values are true.
+   *
+   * @param array $arr
+   *
+   * @return bool if all values are true
+   */
+  public static function all($arr) {
+    return count(array_unique($arr)) === 1 && current($arr);
+  }
+
+
+  /**
+   * Return true if any of the array values are true.
+   *
+   * @param array $arr
+   *
+   * @return bool if any values are true
+   */
+  public static function any($arr) {
+    return count(array_filter($arr)) > 0;
+  }
 }
