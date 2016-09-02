@@ -32,8 +32,8 @@ class ObjectsController {
    * @return array success and the matching object if found
    */
   public static function getObject($request, $response, $args) {
-    $id_or_name = $args['id-or-name'];
-    $object = self::getObjectByIdentifier($id_or_name);
+    $identifier = $args['identifier'];
+    $object = self::getObjectByIdentifier($identifier);
     if ($object !== null) {
       $response->withJson(array(
         'success' => true,
@@ -42,7 +42,7 @@ class ObjectsController {
     } else {
       $response->withJson(array(
         'success' => false,
-        'error'   => "Could not find object matching {$id_or_name}"
+        'error'   => "Could not find object matching {$identifier}"
       ));
     }
   }
@@ -117,12 +117,12 @@ class ObjectsController {
    * @return array success
    */
   public static function deleteObject($request, $response, $args) {
-    $id_or_name = $args['id-or-name'];
-    $object = self::getObjectByIdentifier($id_or_name);
+    $identifier = $args['identifier'];
+    $object = self::getObjectByIdentifier($identifier);
     if ($object === null) {
       return $response->withJson(array(
         'success' => false,
-        'error'   => "Object {$id_or_name} does not exist"
+        'error'   => "Object {$identifier} does not exist"
       ));
     }
 
@@ -242,11 +242,11 @@ class ObjectsController {
     );
   }
 
-  private static function getObjectByIdentifier($id_or_name) {
+  private static function getObjectByIdentifier($identifier) {
     $params = array(
       'any' => array(
-        'id'   => $id_or_name,
-        'name' => $id_or_name
+        'id'   => $identifier,
+        'name' => $identifier
       )
     );
 
