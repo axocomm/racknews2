@@ -38,7 +38,10 @@ $app->group('/objects', function () {
 $app->group('/ipv4', function () {
   $this->get('', '\Racknews\IPv4Controller:getIPv4Allocations');
 
-  $this->post('/{ip}/{object}', '\Racknews\IPv4Controller:allocateIP');
+  $this->group('/{ip}', function () {
+    $this->post('', '\Racknews\IPv4Controller:allocateIP');
+    $this->delete('', '\Racknews\IPv4Controller:unallocateIP');
+  });
 });
 
 $app->run();

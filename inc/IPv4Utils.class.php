@@ -20,4 +20,9 @@ class IPv4Utils {
            ($octets[2] * pow(256, 1)) +
            ($octets[3] * pow(256, 0));
   }
+
+  public static function ipToBin($ip_str) {
+    $ip_int = self::ipToInt($ip_str);
+    return ip4_int2bin($ip_int);
+  }
 }

@@ -44,6 +44,11 @@ class ObjectUtils {
     return array_map(array('self', 'removeIPBin'), $matching_objects);
   }
 
+  public static function getObject($params = array()) {
+    $objects = self::getObjects($params);
+    return (count($objects) > 0) ? current($objects) : null;
+  }
+
   /**
    * Get objects that contain the given key.
    *
