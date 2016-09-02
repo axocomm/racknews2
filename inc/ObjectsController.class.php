@@ -108,6 +108,62 @@ class ObjectsController {
   }
 
   /**
+   * Update an object.
+   *
+   * Accepts an identifier in `args` and a JSON update payload
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success
+   */
+  public static function updateObject($request, $response, $args) {
+    $identifier = $args['identifier'];
+    $object = self::getObjectByIdentifier($identifier);
+    if ($object === null) {
+      return $response->withJson(array(
+        'success' => false,
+        'error'   => "Object {$identifier} does not exist"
+      ));
+    }
+
+    $id = $object['id'];
+    $body = $request->getBody();
+    $updates = @json_decode($body, true);
+    if ($updates === null) {
+      return $response->withJson(array(
+        'success' => false,
+        'error'   => 'Could not parse request body'
+      ));
+    }
+
+    $update_val = function ($k, $default = null) use ($updates, $object) {
+      return (isset($updates[$k])) ? $updates[$k] : $default;
+    };
+
+    $name = $update_val('name');
+    $label = $update_val('label');
+    $has_problems = $update_val('has_problems', false);
+    $asset_no = $update_val('asset_tag');
+    $comment = $update_val('comment');
+
+    commitUpdateObject(
+      $id,
+      $name,
+      $label,
+      $has_problems,
+      $asset_no,
+      $comment
+    );
+
+    return $response->withJson(array(
+      'success' => true,
+      'message' => "Updated {$id}"
+    ));
+  }
+
+  /**
    * Delete an object by ID or name.
    *
    * @param object $request

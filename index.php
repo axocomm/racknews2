@@ -30,6 +30,7 @@ $app->group('/objects', function () {
 
   $this->group('/{identifier}', function () {
     $this->get('', '\Racknews\ObjectsController:getObject');
+    $this->put('', '\Racknews\ObjectsController:updateObject');
     $this->delete('', '\Racknews\ObjectsController:deleteObject');
   });
 });
