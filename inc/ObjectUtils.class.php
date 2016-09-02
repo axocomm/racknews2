@@ -32,6 +32,8 @@ class ObjectUtils {
             return self::withLogMessage($acc, $val);
           case 'tagged':
             return self::tagged($acc, explode(',', $val));
+          case 'ip':
+            return self::withIP($acc, explode(',', $val));
           default:
             return $acc;
         }
@@ -140,6 +142,31 @@ class ObjectUtils {
       function ($object) use ($tags) {
         $object_tags = self::getObjectTags($object);
         return count(array_intersect($object_tags, $tags)) > 0;
+      }
+    );
+  }
+
+  /**
+   * Get an object with the given IP addresses.
+   *
+   * @param array $objects
+   * @param array $ips
+   *
+   * @return array
+   */
+  public static function withIP($objects, $ips) {
+    return array_filter(
+      $objects,
+      function ($object) use ($ips) {
+        if (!isset($object['ipv4']) || count($object['ipv4']) === 0) {
+          return false;
+        }
+
+        $object_ips = array_map(function ($alloc) {
+          return $alloc['addrinfo']['ip'];
+        }, $object['ipv4']);
+
+        return count(array_intersect($object_ips, $ips)) > 0;
       }
     );
   }
