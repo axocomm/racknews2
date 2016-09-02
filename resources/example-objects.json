@@ -2,15 +2,28 @@
   "objects": [
     {
       "name": "icarus",
-      "label": "icarus",
-      "asset_tag": "icarus",
-      "type": "server"
+      "type": "server",
+      "label": "icarus"
+    },
+    {
+      "name": "netgear1G",
+      "type": "network switch",
+      "label": "Netgear GS105"
+    },
+    {
+      "name": "novalis",
+      "type": "server",
+      "label": "novalis"
+    },
+    {
+      "name": "onhub",
+      "type": "router",
+      "label": "OnHub"
     },
     {
       "name": "terminus",
-      "label": "terminus",
-      "asset_tag": "terminus",
-      "type": "server"
+      "type": "server",
+      "label": "terminus"
     }
   ]
 }
