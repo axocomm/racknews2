@@ -12,7 +12,7 @@ class ObjectUtils {
   public static function getObjects($params = array()) {
     $objects = get_objects();
 
-    return array_reduce(
+    $matching_objects = array_reduce(
       array_keys($params),
       function ($acc, $key) use ($params) {
         $val = $params[$key];
@@ -30,12 +30,18 @@ class ObjectUtils {
             return self::withComment($acc, $val);
           case 'log':
             return self::withLogMessage($acc, $val);
+          case 'tagged':
+            return self::tagged($acc, explode(',', $val));
+          case 'ip':
+            return self::withIP($acc, explode(',', $val));
           default:
             return $acc;
         }
       },
       $objects
     );
+
+    return array_map(array('self', 'removeIPBin'), $matching_objects);
   }
 
   /**
@@ -123,6 +129,77 @@ class ObjectUtils {
   }
 
   /**
+   * Get objects with the given tags (any type).
+   *
+   * @param array $objects
+   * @param array $tags
+   *
+   * @return array objects with any of the given tags
+   */
+  public static function tagged($objects, $tags) {
+    return array_filter(
+      $objects,
+      function ($object) use ($tags) {
+        $object_tags = self::getObjectTags($object);
+        return count(array_intersect($object_tags, $tags)) > 0;
+      }
+    );
+  }
+
+  /**
+   * Get an object with the given IP addresses.
+   *
+   * @param array $objects
+   * @param array $ips
+   *
+   * @return array
+   */
+  public static function withIP($objects, $ips) {
+    return array_filter(
+      $objects,
+      function ($object) use ($ips) {
+        if (!isset($object['ipv4']) || count($object['ipv4']) === 0) {
+          return false;
+        }
+
+        $object_ips = array_map(function ($alloc) {
+          return $alloc['addrinfo']['ip'];
+        }, $object['ipv4']);
+
+        return count(array_intersect($object_ips, $ips)) > 0;
+      }
+    );
+  }
+
+  /**
+   * Get atags, etags, and itags of the given object.
+   *
+   * @param array $object
+   *
+   * @return array
+   */
+  public static function getObjectTags($object) {
+    $tag_vals = function ($tag_arr) {
+      return array_map(function ($tag) {
+        return $tag['tag'];
+      }, $tag_arr);
+    };
+
+    $object_tags = array_map(
+      $tag_vals,
+      array(
+        $object['atags'],
+        $object['etags'],
+        $object['itags']
+      )
+    );
+
+    $object_tags = call_user_func_array('array_merge', $object_tags);
+
+    return array_unique($object_tags);
+  }
+
+  /**
    * Get objects that match the given fields.
    *
    * @param array  $objects
@@ -167,10 +244,10 @@ class ObjectUtils {
 
     switch ($mode) {
       case self::MATCH_ANY:
-        return self::any($results);
+        return Helpers::any($results);
       case self::MATCH_ALL:
       default:
-        return self::all($results);
+        return Helpers::all($results);
     }
   }
 
@@ -209,24 +286,23 @@ class ObjectUtils {
   }
 
   /**
-   * Return true iff all array values are true.
+   * Remove converted IP address keys and values to prevent
+   *   encoding issues when sending the JSON response.
    *
-   * @param array $arr
+   * @param array $object
    *
-   * @return bool if all values are true
+   * @return array the object with fixed IP allocation keys and
+   *   no ip_bin
    */
-  private static function all($arr) {
-    return count(array_unique($arr)) === 1 && current($arr);
-  }
+  private static function removeIPBin($object) {
+    $allocs = $object['ipv4'];
+    $addrs = array_map(function ($id) use ($allocs) {
+      $alloc = $allocs[$id];
+      unset($alloc['addrinfo']['ip_bin']);
+      return $alloc;
+    }, array_keys($allocs));
 
-  /**
-   * Return true if any of the array values are true.
-   *
-   * @param array $arr
-   *
-   * @return bool if any values are true
-   */
-  private static function any($arr) {
-    return count(array_filter($arr)) > 0;
+    $object['ipv4'] = $addrs;
+    return $object;
   }
 }

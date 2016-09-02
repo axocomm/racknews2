@@ -1,7 +1,17 @@
 <?php
 namespace Racknews;
 
-class AppController {
+class ObjectsController {
+
+  /**
+   * Query RackTables objects.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success and matching objects
+   */
   public static function getObjects($request, $response, $args) {
     $params = $request->getQueryParams();
     $objects = ObjectUtils::getObjects($params);
@@ -12,22 +22,29 @@ class AppController {
     ));
   }
 
+  /**
+   * Get a single object by ID or name.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success and the matching object if found
+   */
   public static function getObject($request, $response, $args) {
-    $id_or_name = $args['id-or-name'];
-    $params = array(
-      'any' => array(
-        'id'   => $id_or_name,
-        'name' => $id_or_name
-      )
-    );
-
-    $objects = ObjectUtils::getObjects($params);
-    $object = (count($objects) > 0) ? current($objects) : null;
-
-    $response->withJson(array(
-      'success' => true,
-      'object'  => $object
-    ));
+    $identifier = $args['identifier'];
+    $object = self::getObjectByIdentifier($identifier);
+    if ($object !== null) {
+      $response->withJson(array(
+        'success' => true,
+        'object'  => $object
+      ));
+    } else {
+      $response->withJson(array(
+        'success' => false,
+        'error'   => "Could not find object matching {$identifier}"
+      ));
+    }
   }
 
   /**
@@ -87,6 +104,34 @@ class AppController {
     $response->withJson(array(
       'success' => true,
       'objects' => $results
+    ));
+  }
+
+  /**
+   * Delete an object by ID or name.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array success
+   */
+  public static function deleteObject($request, $response, $args) {
+    $identifier = $args['identifier'];
+    $object = self::getObjectByIdentifier($identifier);
+    if ($object === null) {
+      return $response->withJson(array(
+        'success' => false,
+        'error'   => "Object {$identifier} does not exist"
+      ));
+    }
+
+    $id = $object['id'];
+    commitDeleteObject($id);
+
+    $response->withJson(array(
+      'success' => true,
+      'message' => "Deleted $id"
     ));
   }
 
@@ -195,5 +240,18 @@ class AppController {
       },
       array('objects' => array())
     );
+  }
+
+  private static function getObjectByIdentifier($identifier) {
+    $params = array(
+      'any' => array(
+        'id'   => $identifier,
+        'name' => $identifier,
+        'FQDN' => $identifier
+      )
+    );
+
+    $objects = ObjectUtils::getObjects($params);
+    return (count($objects) > 0) ? current($objects) : null;
   }
 }
