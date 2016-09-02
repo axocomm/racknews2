@@ -12,7 +12,7 @@ class ObjectUtils {
   public static function getObjects($params = array()) {
     $objects = get_objects();
 
-    return array_reduce(
+    $matching_objects = array_reduce(
       array_keys($params),
       function ($acc, $key) use ($params) {
         $val = $params[$key];
@@ -32,12 +32,16 @@ class ObjectUtils {
             return self::withLogMessage($acc, $val);
           case 'tagged':
             return self::tagged($acc, explode(',', $val));
+          case 'ip':
+            return self::withIP($acc, explode(',', $val));
           default:
             return $acc;
         }
       },
       $objects
     );
+
+    return array_map(array('self', 'removeIPBin'), $matching_objects);
   }
 
   /**
@@ -138,6 +142,31 @@ class ObjectUtils {
       function ($object) use ($tags) {
         $object_tags = self::getObjectTags($object);
         return count(array_intersect($object_tags, $tags)) > 0;
+      }
+    );
+  }
+
+  /**
+   * Get an object with the given IP addresses.
+   *
+   * @param array $objects
+   * @param array $ips
+   *
+   * @return array
+   */
+  public static function withIP($objects, $ips) {
+    return array_filter(
+      $objects,
+      function ($object) use ($ips) {
+        if (!isset($object['ipv4']) || count($object['ipv4']) === 0) {
+          return false;
+        }
+
+        $object_ips = array_map(function ($alloc) {
+          return $alloc['addrinfo']['ip'];
+        }, $object['ipv4']);
+
+        return count(array_intersect($object_ips, $ips)) > 0;
       }
     );
   }
@@ -254,5 +283,26 @@ class ObjectUtils {
 
       return $acc;
     }, array());
+  }
+
+  /**
+   * Remove converted IP address keys and values to prevent
+   *   encoding issues when sending the JSON response.
+   *
+   * @param array $object
+   *
+   * @return array the object with fixed IP allocation keys and
+   *   no ip_bin
+   */
+  private static function removeIPBin($object) {
+    $allocs = $object['ipv4'];
+    $addrs = array_map(function ($id) use ($allocs) {
+      $alloc = $allocs[$id];
+      unset($alloc['addrinfo']['ip_bin']);
+      return $alloc;
+    }, array_keys($allocs));
+
+    $object['ipv4'] = $addrs;
+    return $object;
   }
 }

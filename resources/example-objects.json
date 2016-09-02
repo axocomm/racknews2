@@ -1,0 +1,16 @@
+{
+  "objects": [
+    {
+      "name": "icarus",
+      "label": "icarus",
+      "asset_tag": "icarus",
+      "type": "server"
+    },
+    {
+      "name": "terminus",
+      "label": "terminus",
+      "asset_tag": "terminus",
+      "type": "server"
+    }
+  ]
+}

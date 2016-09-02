@@ -30,3 +30,9 @@ function get_objects() {
     $rt_objects
   );
 }
+
+if (!function_exists('loadIPv4AddrList')) {
+  function loadIPv4AddrList(&$info) {
+    \loadIPAddrList($info);
+  }
+}
