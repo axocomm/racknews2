@@ -246,7 +246,8 @@ class ObjectsController {
     $params = array(
       'any' => array(
         'id'   => $identifier,
-        'name' => $identifier
+        'name' => $identifier,
+        'FQDN' => $identifier
       )
     );
 
