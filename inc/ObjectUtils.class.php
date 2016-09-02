@@ -12,7 +12,7 @@ class ObjectUtils {
   public static function getObjects($params = array()) {
     $objects = get_objects();
 
-    return array_reduce(
+    $matching_objects = array_reduce(
       array_keys($params),
       function ($acc, $key) use ($params) {
         $val = $params[$key];
@@ -38,6 +38,8 @@ class ObjectUtils {
       },
       $objects
     );
+
+    return array_map(array('self', 'removeIPBin'), $matching_objects);
   }
 
   /**
@@ -254,5 +256,26 @@ class ObjectUtils {
 
       return $acc;
     }, array());
+  }
+
+  /**
+   * Remove converted IP address keys and values to prevent
+   *   encoding issues when sending the JSON response.
+   *
+   * @param array $object
+   *
+   * @return array the object with fixed IP allocation keys and
+   *   no ip_bin
+   */
+  private static function removeIPBin($object) {
+    $allocs = $object['ipv4'];
+    $addrs = array_map(function ($id) use ($allocs) {
+      $alloc = $allocs[$id];
+      unset($alloc['addrinfo']['ip_bin']);
+      return $alloc;
+    }, array_keys($allocs));
+
+    $object['ipv4'] = $addrs;
+    return $object;
   }
 }
