@@ -9,4 +9,13 @@ class IPv4Controller {
       'allocations' => $allocations
     ));
   }
+
+  public static function allocateIP($request, $response, $args) {
+    $ip = $args['ip'];
+    $object_id = $args['object'];
+    $response->withJson(array(
+      'success' => true,
+      'result'  => IPv4Utils::ipToInt($ip)
+    ));
+  }
 }
