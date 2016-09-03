@@ -14,13 +14,20 @@ use \Racknews\ObjectsController as ObjectsController;
 use \Racknews\IPv4Controller as IPv4Controller;
 
 $app = new \Slim\App;
-$app->get('/', function ($request, $response) {
-  $resp = array(
-    'success'         => true,
-    'racktables_root' => RACKTABLES_ROOT
-  );
 
-  $response->withJson($resp);
+$container = $app->getContainer();
+$container['view'] = function ($container) {
+  return new \Slim\Views\PhpRenderer('resources/templates/');
+};
+
+$app->get('/readme', function ($request, $response) use ($app) {
+  $readme_content = @file_get_contents('README.md');
+  $parsedown = new Parsedown();
+  $readme = $parsedown->text($readme_content);
+
+  return $this->view->render($response, 'readme.php', array(
+    'content' => $readme
+  ));
 });
 
 $app->group('/objects', function () {
