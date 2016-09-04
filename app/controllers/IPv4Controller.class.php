@@ -1,16 +1,16 @@
 <?php
 namespace Racknews;
 
-class IPv4Controller {
-  public static function getIPv4Allocations($request, $response, $args) {
-    $allocations = IPv4Utils::getAddresses();
+class IPv4Controller extends Controller {
+  public function getIPv4Allocations($request, $response, $args) {
+    $allocations = IPv4Address::all();
     $response->withJson(array(
       'success'     => true,
       'allocations' => $allocations
     ));
   }
 
-  public static function allocateIP($request, $response, $args) {
+  public function allocateIP($request, $response, $args) {
     $ip = $args['ip'];
     $identifier = $request->getQueryParam('object');
     $name = $request->getQueryParam('name', '');
@@ -23,7 +23,7 @@ class IPv4Controller {
       ));
     }
 
-    $object = ObjectUtils::getObject(array(
+    $object = Object::first(array(
       'any' => array(
         'name' => $identifier,
         'id'   => $identifier,
@@ -39,7 +39,7 @@ class IPv4Controller {
     }
 
     $object_id = $object['id'];
-    $ip_bin = IPv4Utils::ipToBin($ip);
+    $ip_bin = IPv4Address::ipToBin($ip);
 
     bindIPv4ToObject(
       $ip_bin,
@@ -54,7 +54,7 @@ class IPv4Controller {
     ));
   }
 
-  public static function unallocateIP($request, $response, $args) {
+  public function unallocateIP($request, $response, $args) {
     $ip = $args['ip'];
     $identifier = $request->getQueryParam('object');
 
@@ -65,7 +65,7 @@ class IPv4Controller {
       ));
     }
 
-    $object = ObjectUtils::getObject(array(
+    $object = Object::find(array(
       'any' => array(
         'name' => $identifier,
         'id'   => $identifier,
@@ -81,7 +81,7 @@ class IPv4Controller {
     }
 
     $object_id = $object['id'];
-    $ip_bin = IPv4Utils::ipToBin($ip);
+    $ip_bin = IPv4Address::ipToBin($ip);
 
     unbindIPFromObject($ip_bin, $object_id);
 

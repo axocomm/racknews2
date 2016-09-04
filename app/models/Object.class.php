@@ -1,16 +1,74 @@
 <?php
 namespace Racknews;
 
-// NB: probably want to organize this better and have a
-// consistent naming scheme for methods
+/**
+ * A Racknews Object.
+ */
+class Object {
 
-class ObjectUtils {
+  /**
+   * The format of an `any` or `all` match parameter.
+   *
+   * @var string
+   */
   const MATCH_RE = '/^([A-Za-z_]+):(.+)$/';
+
+  /**
+   * The `any` match mode.
+   *
+   * @var string
+   */
   const MATCH_ANY = 'any';
+
+  /**
+   * The `all` match mode.
+   *
+   * @var string
+   */
   const MATCH_ALL = 'all';
 
-  public static function getObjects($params = array()) {
-    $objects = get_objects();
+  /**
+   * Get all objects out of RackTables.
+   *
+   * @return array all objects
+   */
+  public static function all() {
+    $rt_objects = scanRealmByText('object');
+
+    return array_map(
+      function ($object) {
+        $info = spotEntity('object', $object['id']);
+        amplifyCell($info);
+
+        $attrs = array_reduce(
+          getAttrValues($object['id']),
+          function ($attr_acc, $record) {
+            if (!isset($record['name'])) {
+              throw new \Exception("Broken record for {$object['id']}");
+            }
+
+            $attr_acc[$record['name']] = $record['value'];
+            return $attr_acc;
+          },
+          array()
+        );
+
+        $info = array_merge($info, $attrs);
+        return $info;
+      },
+      $rt_objects
+    );
+  }
+
+  /**
+   * Find objects by criteria.
+   *
+   * @param array query criteria
+   *
+   * @return array matching objects
+   */
+  public static function find($params = array()) {
+    $objects = self::all();
 
     $matching_objects = array_reduce(
       array_keys($params),
@@ -44,8 +102,15 @@ class ObjectUtils {
     return array_map(array('self', 'removeIPBin'), $matching_objects);
   }
 
-  public static function getObject($params = array()) {
-    $objects = self::getObjects($params);
+  /**
+   * Find the first object matching the query.
+   *
+   * @param array the query criteria
+   *
+   * @return mixed the first matching object or null
+   */
+  public static function first($params = array()) {
+    $objects = self::find($params);
     return (count($objects) > 0) ? current($objects) : null;
   }
 
