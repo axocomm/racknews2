@@ -1,11 +1,37 @@
 <?php
 namespace Racknews;
 
+/**
+ * A Racknews Object.
+ */
 class Object {
+
+  /**
+   * The format of an `any` or `all` match parameter.
+   *
+   * @var string
+   */
   const MATCH_RE = '/^([A-Za-z_]+):(.+)$/';
+
+  /**
+   * The `any` match mode.
+   *
+   * @var string
+   */
   const MATCH_ANY = 'any';
+
+  /**
+   * The `all` match mode.
+   *
+   * @var string
+   */
   const MATCH_ALL = 'all';
 
+  /**
+   * Get all objects out of RackTables.
+   *
+   * @return array all objects
+   */
   public static function all() {
     $rt_objects = scanRealmByText('object');
 
@@ -34,6 +60,13 @@ class Object {
     );
   }
 
+  /**
+   * Find objects by criteria.
+   *
+   * @param array query criteria
+   *
+   * @return array matching objects
+   */
   public static function find($params = array()) {
     $objects = self::all();
 
@@ -69,6 +102,13 @@ class Object {
     return array_map(array('self', 'removeIPBin'), $matching_objects);
   }
 
+  /**
+   * Find the first object matching the query.
+   *
+   * @param array the query criteria
+   *
+   * @return mixed the first matching object or null
+   */
   public static function first($params = array()) {
     $objects = self::find($params);
     return (count($objects) > 0) ? current($objects) : null;
