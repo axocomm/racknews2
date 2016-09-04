@@ -17,6 +17,8 @@ $app->group('/objects', function () {
 
   $this->post('', '\Racknews\ObjectsController:addObjects');
 
+  $this->get('/attributes', '\Racknews\ObjectsController:getAttributeMap');
+
   $this->group('/{identifier}', function () {
     $this->get('', '\Racknews\ObjectsController:getObject');
     $this->put('', '\Racknews\ObjectsController:updateObject');
