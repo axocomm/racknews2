@@ -1,16 +1,17 @@
 <?php
 namespace Racknews;
 
-// NB: probably want to organize this better and have a
-// consistent naming scheme for methods
-
-class ObjectUtils {
+class Object {
   const MATCH_RE = '/^([A-Za-z_]+):(.+)$/';
   const MATCH_ANY = 'any';
   const MATCH_ALL = 'all';
 
-  public static function getObjects($params = array()) {
-    $objects = get_objects();
+  public static function all() {
+    return get_objects();
+  }
+
+  public static function find($params = array()) {
+    $objects = self::all();
 
     $matching_objects = array_reduce(
       array_keys($params),
@@ -44,8 +45,8 @@ class ObjectUtils {
     return array_map(array('self', 'removeIPBin'), $matching_objects);
   }
 
-  public static function getObject($params = array()) {
-    $objects = self::getObjects($params);
+  public static function first($params = array()) {
+    $objects = self::find($params);
     return (count($objects) > 0) ? current($objects) : null;
   }
 

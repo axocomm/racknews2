@@ -14,7 +14,7 @@ class ObjectsController extends Controller {
    */
   public function getObjects($request, $response, $args) {
     $params = $request->getQueryParams();
-    $objects = ObjectUtils::getObjects($params);
+    $objects = Object::find($params);
 
     $response->withJson(array(
       'success' => true,
@@ -239,7 +239,7 @@ class ObjectsController extends Controller {
    */
   private static function prepareNewObjects($objects) {
     $required_keys = array('name', 'type');
-    $object_types = ObjectUtils::getObjectTypeMap();
+    $object_types = Object::getObjectTypeMap();
 
     return array_reduce(
       $objects,
@@ -307,7 +307,6 @@ class ObjectsController extends Controller {
       )
     );
 
-    $objects = ObjectUtils::getObjects($params);
-    return (count($objects) > 0) ? current($objects) : null;
+    return Object::first($params);
   }
 }

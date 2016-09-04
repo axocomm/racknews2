@@ -23,7 +23,7 @@ class IPv4Controller extends Controller {
       ));
     }
 
-    $object = ObjectUtils::getObject(array(
+    $object = Object::first(array(
       'any' => array(
         'name' => $identifier,
         'id'   => $identifier,
@@ -65,7 +65,7 @@ class IPv4Controller extends Controller {
       ));
     }
 
-    $object = ObjectUtils::getObject(array(
+    $object = Object::find(array(
       'any' => array(
         'name' => $identifier,
         'id'   => $identifier,
