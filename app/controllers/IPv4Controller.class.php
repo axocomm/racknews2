@@ -3,7 +3,7 @@ namespace Racknews;
 
 class IPv4Controller extends Controller {
   public function getIPv4Allocations($request, $response, $args) {
-    $allocations = IPv4Utils::getAddresses();
+    $allocations = IPv4Address::all();
     $response->withJson(array(
       'success'     => true,
       'allocations' => $allocations
@@ -39,7 +39,7 @@ class IPv4Controller extends Controller {
     }
 
     $object_id = $object['id'];
-    $ip_bin = IPv4Utils::ipToBin($ip);
+    $ip_bin = IPv4Address::ipToBin($ip);
 
     bindIPv4ToObject(
       $ip_bin,
@@ -81,7 +81,7 @@ class IPv4Controller extends Controller {
     }
 
     $object_id = $object['id'];
-    $ip_bin = IPv4Utils::ipToBin($ip);
+    $ip_bin = IPv4Address::ipToBin($ip);
 
     unbindIPFromObject($ip_bin, $object_id);
 

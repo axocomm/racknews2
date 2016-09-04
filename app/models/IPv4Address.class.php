@@ -1,8 +1,8 @@
 <?php
 namespace Racknews;
 
-class IPv4Utils {
-  public static function getAddresses() {
+class IPv4Address {
+  public static function all() {
     return getAllIPv4Allocations();
   }
 
