@@ -33,7 +33,7 @@ class ObjectsController extends Controller {
    */
   public function getObject($request, $response, $args) {
     $identifier = $args['identifier'];
-    $object = self::getObjectByIdentifier($identifier);
+    $object = Object::byIdentifier($identifier);
     if ($object !== null) {
       $response->withJson(array(
         'success' => true,
@@ -120,7 +120,7 @@ class ObjectsController extends Controller {
    */
   public function updateObject($request, $response, $args) {
     $identifier = $args['identifier'];
-    $object = self::getObjectByIdentifier($identifier);
+    $object = Object::byIdentifier($identifier);
     if ($object === null) {
       return $response->withJson(array(
         'success' => false,
@@ -174,7 +174,7 @@ class ObjectsController extends Controller {
    */
   public function deleteObject($request, $response, $args) {
     $identifier = $args['identifier'];
-    $object = self::getObjectByIdentifier($identifier);
+    $object = Object::byIdentifier($identifier);
     if ($object === null) {
       return $response->withJson(array(
         'success' => false,
@@ -296,17 +296,5 @@ class ObjectsController extends Controller {
       },
       array('objects' => array())
     );
-  }
-
-  private static function getObjectByIdentifier($identifier) {
-    $params = array(
-      'any' => array(
-        'id'   => $identifier,
-        'name' => $identifier,
-        'FQDN' => $identifier
-      )
-    );
-
-    return Object::first($params);
   }
 }

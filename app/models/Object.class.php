@@ -115,6 +115,25 @@ class Object {
   }
 
   /**
+   * Get an object by ID, name, or FQDN.
+   *
+   * @param string $identifier
+   *
+   * @return mixed the matching object or null
+   */
+  public static function byIdentifier($identifier) {
+    $params = array(
+      'any' => array(
+        'id'   => $identifier,
+        'name' => $identifier,
+        'FQDN' => $identifier
+      )
+    );
+
+    return self::first($params);
+  }
+
+  /**
    * Get objects that contain the given key.
    *
    * @param array  $objects
