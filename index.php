@@ -5,11 +5,15 @@ require 'init.php';
 require 'inc/Helpers.class.php';
 require 'inc/ObjectUtils.class.php';
 require 'inc/IPv4Utils.class.php';
+require 'inc/Controller.class.php';
+require 'inc/AppController.class.php';
 require 'inc/ObjectsController.class.php';
 require 'inc/IPv4Controller.class.php';
 
 use \Racknews\Helpers as Helpers;
 use \Racknews\ObjectUtils as ObjectUtils;
+use \Racknews\Controller as Controller;
+use \Racknews\AppController as AppController;
 use \Racknews\ObjectsController as ObjectsController;
 use \Racknews\IPv4Controller as IPv4Controller;
 

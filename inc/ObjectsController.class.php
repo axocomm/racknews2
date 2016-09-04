@@ -1,7 +1,7 @@
 <?php
 namespace Racknews;
 
-class ObjectsController {
+class ObjectsController extends Controller {
 
   /**
    * Query RackTables objects.
@@ -12,7 +12,7 @@ class ObjectsController {
    *
    * @return array success and matching objects
    */
-  public static function getObjects($request, $response, $args) {
+  public function getObjects($request, $response, $args) {
     $params = $request->getQueryParams();
     $objects = ObjectUtils::getObjects($params);
 
@@ -31,7 +31,7 @@ class ObjectsController {
    *
    * @return array success and the matching object if found
    */
-  public static function getObject($request, $response, $args) {
+  public function getObject($request, $response, $args) {
     $identifier = $args['identifier'];
     $object = self::getObjectByIdentifier($identifier);
     if ($object !== null) {
@@ -59,7 +59,7 @@ class ObjectsController {
    *
    * @return array success and either error or added IDs
    */
-  public static function addObjects($request, $response, $args) {
+  public function addObjects($request, $response, $args) {
     $data = self::parseNewObjectData($request);
 
     if ($data === null) {
@@ -118,7 +118,7 @@ class ObjectsController {
    *
    * @return array success
    */
-  public static function updateObject($request, $response, $args) {
+  public function updateObject($request, $response, $args) {
     $identifier = $args['identifier'];
     $object = self::getObjectByIdentifier($identifier);
     if ($object === null) {
@@ -172,7 +172,7 @@ class ObjectsController {
    *
    * @return array success
    */
-  public static function deleteObject($request, $response, $args) {
+  public function deleteObject($request, $response, $args) {
     $identifier = $args['identifier'];
     $object = self::getObjectByIdentifier($identifier);
     if ($object === null) {

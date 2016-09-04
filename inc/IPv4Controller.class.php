@@ -1,8 +1,8 @@
 <?php
 namespace Racknews;
 
-class IPv4Controller {
-  public static function getIPv4Allocations($request, $response, $args) {
+class IPv4Controller extends Controller {
+  public function getIPv4Allocations($request, $response, $args) {
     $allocations = IPv4Utils::getAddresses();
     $response->withJson(array(
       'success'     => true,
@@ -10,7 +10,7 @@ class IPv4Controller {
     ));
   }
 
-  public static function allocateIP($request, $response, $args) {
+  public function allocateIP($request, $response, $args) {
     $ip = $args['ip'];
     $identifier = $request->getQueryParam('object');
     $name = $request->getQueryParam('name', '');
@@ -54,7 +54,7 @@ class IPv4Controller {
     ));
   }
 
-  public static function unallocateIP($request, $response, $args) {
+  public function unallocateIP($request, $response, $args) {
     $ip = $args['ip'];
     $identifier = $request->getQueryParam('object');
 
