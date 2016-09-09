@@ -28,6 +28,16 @@ class Object {
   const MATCH_ALL = 'all';
 
   /**
+   * Basic update fields.
+   *
+   * @var array
+   */
+  const UPDATE_FIELDS = array(
+    'id', 'name', 'label',
+    'has_problems', 'asset_tag', 'comment'
+  );
+
+  /**
    * Get all objects out of RackTables.
    *
    * @return array all objects
@@ -112,6 +122,25 @@ class Object {
   public static function first($params = array()) {
     $objects = self::find($params);
     return (count($objects) > 0) ? current($objects) : null;
+  }
+
+  /**
+   * Get an object by ID, name, or FQDN.
+   *
+   * @param string $identifier
+   *
+   * @return mixed the matching object or null
+   */
+  public static function byIdentifier($identifier) {
+    $params = array(
+      'any' => array(
+        'id'   => $identifier,
+        'name' => $identifier,
+        'FQDN' => $identifier
+      )
+    );
+
+    return self::first($params);
   }
 
   /**
@@ -329,6 +358,28 @@ class Object {
   public static function getObjectTypeMap() {
     $types = readChapter(CHAP_OBJTYPE);
     return array_flip(array_map('strtolower', $types));
+  }
+
+  /**
+   * Get the object attribute map.
+   *
+   * @return array attributes keyed by name
+   */
+  public static function getAttributes() {
+    $attrs = getAttrMap();
+    return array_reduce(
+      array_keys($attrs),
+      function ($acc, $attr_id) use ($attrs) {
+        $attr = $attrs[$attr_id];
+        $name = strtolower($attr['name']);
+        $acc[$name] = array(
+          'id'    => $attr['id'],
+          'type'  => $attr['type']
+        );
+        return $acc;
+      },
+      array()
+    );
   }
 
   /**

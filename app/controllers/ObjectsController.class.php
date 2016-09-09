@@ -33,7 +33,7 @@ class ObjectsController extends Controller {
    */
   public function getObject($request, $response, $args) {
     $identifier = $args['identifier'];
-    $object = self::getObjectByIdentifier($identifier);
+    $object = Object::byIdentifier($identifier);
     if ($object !== null) {
       $response->withJson(array(
         'success' => true,
@@ -108,7 +108,7 @@ class ObjectsController extends Controller {
   }
 
   /**
-   * Update an object.
+   * Update an existing object.
    *
    * Accepts an identifier in `args` and a JSON update payload
    *
@@ -116,11 +116,11 @@ class ObjectsController extends Controller {
    * @param object $response
    * @param array  $args
    *
-   * @return array success
+   * @return array success and result
    */
   public function updateObject($request, $response, $args) {
     $identifier = $args['identifier'];
-    $object = self::getObjectByIdentifier($identifier);
+    $object = Object::byIdentifier($identifier);
     if ($object === null) {
       return $response->withJson(array(
         'success' => false,
@@ -128,18 +128,63 @@ class ObjectsController extends Controller {
       ));
     }
 
-    $id = $object['id'];
+    $object_id = $object['id'];
+    $attributes = Object::getAttributes();
+
     $body = $request->getBody();
-    $updates = @json_decode($body, true);
-    if ($updates === null) {
+    $payload = @json_decode($body, true);
+    if ($payload === null) {
       return $response->withJson(array(
         'success' => false,
         'error'   => 'Could not parse request body'
       ));
     }
 
-    $update_val = function ($k, $default = null) use ($updates, $object) {
-      return (isset($updates[$k])) ? $updates[$k] : $default;
+    // Split update keys into attributes and basic fields.
+    $updates = array_reduce(
+      array_keys($payload),
+      function ($acc, $k) use ($payload, $attributes) {
+        $v = $payload[$k];
+        if (array_key_exists($k, $attributes)) {
+          $acc['attrs'][$k] = $v;
+        } else if (in_array($k, Object::UPDATE_FIELDS)) {
+          $acc['fields'][$k] = $v;
+        } else {
+          $acc['errors'][] = $k;
+        }
+
+        return $acc;
+      },
+      array(
+        'attrs'  => array(),
+        'fields' => array(),
+        'errors' => array()
+      )
+    );
+
+    if (count($updates['errors'])) {
+      return $response->withJson(array(
+        'success' => false,
+        'error'   => 'Invalid fields ' . implode($updates['errors'], ', ')
+      ));
+    }
+
+    // Update attribute values.
+    foreach ($updates['attrs'] as $k => $v) {
+      $attr_id = $attributes[$k]['id'];
+      commitUpdateAttrValue($object_id, $attr_id, $v);
+    }
+
+    // Update basic fields.
+    $fields = $updates['fields'];
+    $update_val = function ($k, $default = null) use ($fields, $object) {
+      if (isset($fields[$k])) {
+        return $fields[$k];
+      } else if (isset($object[$k])) {
+        return $object[$k];
+      } else {
+        return $default;
+      }
     };
 
     $name = $update_val('name');
@@ -149,7 +194,7 @@ class ObjectsController extends Controller {
     $comment = $update_val('comment');
 
     commitUpdateObject(
-      $id,
+      $object_id,
       $name,
       $label,
       $has_problems,
@@ -159,7 +204,7 @@ class ObjectsController extends Controller {
 
     return $response->withJson(array(
       'success' => true,
-      'message' => "Updated {$id}"
+      'updates' => $updates
     ));
   }
 
@@ -174,7 +219,7 @@ class ObjectsController extends Controller {
    */
   public function deleteObject($request, $response, $args) {
     $identifier = $args['identifier'];
-    $object = self::getObjectByIdentifier($identifier);
+    $object = Object::byIdentifier($identifier);
     if ($object === null) {
       return $response->withJson(array(
         'success' => false,
@@ -188,6 +233,22 @@ class ObjectsController extends Controller {
     $response->withJson(array(
       'success' => true,
       'message' => "Deleted $id"
+    ));
+  }
+
+  /**
+   * Get the attributes map.
+   *
+   * @param object $request
+   * @param object $response
+   * @param array  $args
+   *
+   * @return array
+   */
+  public function getAttributeMap($request, $response, $args) {
+    $response->withJson(array(
+      'success'    => true,
+      'attributes' => Object::getAttributes()
     ));
   }
 
@@ -296,17 +357,5 @@ class ObjectsController extends Controller {
       },
       array('objects' => array())
     );
-  }
-
-  private static function getObjectByIdentifier($identifier) {
-    $params = array(
-      'any' => array(
-        'id'   => $identifier,
-        'name' => $identifier,
-        'FQDN' => $identifier
-      )
-    );
-
-    return Object::first($params);
   }
 }
