@@ -7,4 +7,8 @@ class AppController extends Controller {
       'content' => 'foo'
     ));
   }
+
+  public function report($request, $response, $args) {
+    return $this->ci->view->render($response, 'report.twig.html');
+  }
 }

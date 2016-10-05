@@ -3,6 +3,20 @@ require 'vendor/autoload.php';
 require 'init.php';
 
 $app = new \Slim\App;
+
+// Setup templates
+$container = $app->getContainer();
+$container['view'] = function ($container) {
+  $view = new \Slim\Views\Twig(TEMPLATE_DIR);
+
+  $view->addExtension(new \Slim\Views\TwigExtension(
+    $container['router'],
+    $container['request']->getUri()
+  ));
+
+  return $view;
+};
+
 $app->get('/', function ($request, $response) {
   $resp = array(
     'success'         => true,
@@ -11,6 +25,8 @@ $app->get('/', function ($request, $response) {
 
   $response->withJson($resp);
 });
+
+$app->get('/report', '\Racknews\AppController:report');
 
 $app->group('/objects', function () {
   $this->get('', '\Racknews\ObjectsController:getObjects');
