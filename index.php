@@ -26,6 +26,9 @@ $app->get('/', function ($request, $response) {
   $response->withJson($resp);
 });
 
+$app->get('/css/{filename}', '\Racknews\AppController:css')->setName('css');
+$app->get('/js/{filename}', '\Racknews\AppController:js')->setName('js');
+
 $app->get('/report', '\Racknews\AppController:report');
 
 $app->group('/objects', function () {
