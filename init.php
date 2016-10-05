@@ -1,6 +1,8 @@
 <?php
 define('RACKTABLES_ROOT', dirname(__FILE__) . '/../');
 define('APP', dirname(__FILE__) . '/app');
+define('TEMPLATE_DIR', APP . '/templates');
+define('CACHE_DIR', APP . '/tmp/cache');
 
 require RACKTABLES_ROOT . '/inc/init.php';
 
